@@ -4,14 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Drift Graphing Calculator</title>
+  <link rel="stylesheet" href="graphing.css">
 </head>
 <body>
-  <nav id="navbar">
-  <div class="logo">
-    <h1>Drift Graphing Calculator</h1>
-  </div>
-  </nav>
-  <section id="calc-panel"></section>
-  <section id="graphing-panel"></section>
+  <header id="header">
+    <div class="logo">
+        <h1>Drift Graphing Calculator</h1>
+    </div>
+    <nav id="navbar">
+    </nav>
+  </header>
+  
+  <main>
+    <section id="calc-panel"></section>
+    <section id="graphing-panel">
+      <canvas id="my-canvas"></canvas>
+    </section>
+  </main>
+    
+
+  <script src="graphing.js"></script>
 </body>
 </html>
