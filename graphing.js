@@ -5,6 +5,13 @@ const ctx = canvas.getContext('2d');
 canvas.width = panelContainer.offsetWidth;
 canvas.height = panelContainer.offsetHeight;
 
+//update panelContainer whenever window is resized
+window.addEventListener('resize', () => {
+  canvas.width = panelContainer.offsetWidth;
+  canvas.height = panelContainer.offsetHeight;
+  render();
+})
+
 const viewportTransform = {
   x: 0,
   y: 0,
@@ -14,6 +21,32 @@ const viewportTransform = {
 const drawRect = (x, y, width, height, color) => {
   ctx.fillStyle = color;
   ctx.fillRect(x, y, width, height);
+}
+
+const drawGrid = () => {
+  const step = 30;
+
+  ctx.beginPath();
+  ctx.lineWidth = 0.5;
+  ctx.strokeStyle = '#9e9e9e';
+
+  //establish offset based on the new viewport
+  const offsetX = viewportTransform.x % step;
+  const offsetY = viewportTransform.y % step;
+
+  //draw Vertical Lines
+  for (let x = offsetX + 0.5; x <= canvas.width; x += step) {
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.clientHeight);
+  }
+
+  //draw Horizontal Lines
+  for (let y = offsetY + 0.5; y <= canvas.height; y+= step) {
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.clientWidth, y);
+  }
+
+  ctx.stroke();
 }
 
 //keep track of previous mouse position for later
@@ -35,10 +68,32 @@ const updatePanning = (e) => {
   previousY = localY;
 }
 
-const render = () => {
+const updateZooming = (e) => {
+  const oldScale = viewportTransform.scale;
+  const oldX = viewportTransform.x;
+  const oldY = viewportTransform.y;
 
+  const localX = e.clientX;
+  const localY = e.clientY;
+
+  const previousScale = viewportTransform.scale;
+
+  const newScale = (viewportTransform.scale += e.deltaY * -0.01);
+
+  const newX = localX - (localX - oldX) * (newScale / previousScale);
+  const newY = localY - (localY - oldY) * (newScale / previousScale);
+
+  viewportTransform.x = newX;
+  viewportTransform.y = newY;
+  viewportTransform.scale = newScale;
+}
+
+const render = () => {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0,0, canvas.width, canvas.height);
+  
+  drawGrid();
+
   ctx.setTransform(
     viewportTransform.scale,
     0,
@@ -55,43 +110,24 @@ const render = () => {
 const onMouseMove = (e) => {
   updatePanning(e);
   render();
-  console.log(e);
 }
 
+const onMouseWheel = (e) => {
+  updateZooming(e);
+  render();
+}
+
+/* Event Listeners */
 canvas.addEventListener('mousedown', (e) => {
   previousX = e.clientX;
   previousY = e.clientY;
 
   canvas.addEventListener('mousemove', onMouseMove);
 })
-
 canvas.addEventListener('mouseup', (e) => {
   canvas.removeEventListener('mousemove', onMouseMove);
 })
+canvas.addEventListener('wheel', onMouseWheel);
 
 
-// const step = 30;
-
-// ctx.beginPath();
-// ctx.lineWidth = 0.5;
-// ctx.strokeStyle = '#9e9e9e';
-
-// //draw Vertical Lines
-
-// for (let x = 0.5; x <= canvas.width; x += step) {
-//   ctx.moveTo(x, 0);
-//   ctx.lineTo(x, canvas.clientHeight);
-// }
-
-// //draw Horizontal Lines
-
-// for (let y = 0.5; y <= canvas.height; y+= step) {
-//   ctx.moveTo(0, y);
-//   ctx.lineTo(canvas.clientWidth, y);
-// }
-
-// ctx.stroke();
-
-
-
-
+render();
