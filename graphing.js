@@ -18,17 +18,13 @@ const viewportTransform = {
   scale: 1
 };
 
-const drawRect = (x, y, width, height, color) => {
-  ctx.fillStyle = color;
-  ctx.fillRect(x, y, width, height);
-}
-
 const drawGrid = () => {
   const step = 30;
 
   ctx.beginPath();
   ctx.lineWidth = 0.5;
   ctx.strokeStyle = '#9e9e9e';
+  ctx.font = "10px Arial";
 
   //establish offset based on the new viewport
   const offsetX = viewportTransform.x % step;
@@ -38,6 +34,8 @@ const drawGrid = () => {
   for (let x = offsetX + 0.5; x <= canvas.width; x += step) {
     ctx.moveTo(x, 0);
     ctx.lineTo(x, canvas.clientHeight);
+    const unit = parseInt(x / step);
+    ctx.fillText(unit.toString(), x, canvas.height / 2);
   }
 
   //draw Horizontal Lines
@@ -45,6 +43,17 @@ const drawGrid = () => {
     ctx.moveTo(0, y);
     ctx.lineTo(canvas.clientWidth, y);
   }
+  
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = '#3a3a3a';
+  ctx.moveTo(viewportTransform.x + parseInt(canvas.width / 2), 0);
+  ctx.lineTo(viewportTransform.x + parseInt(canvas.width / 2), canvas.height);
+
+  ctx.moveTo(0,viewportTransform.y + parseInt(canvas.height / 2));
+  ctx.lineTo(canvas.width, viewportTransform.y + parseInt(canvas.height / 2));
 
   ctx.stroke();
 }
@@ -103,8 +112,6 @@ const render = () => {
     viewportTransform.y
   );
 
-  drawRect(0, 50, 100, 100, 'red');
-  drawRect(200, 200, 100, 100, 'blue');
 }
 
 const onMouseMove = (e) => {
@@ -131,3 +138,4 @@ canvas.addEventListener('wheel', onMouseWheel);
 
 
 render();
+
