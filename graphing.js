@@ -34,9 +34,9 @@ const drawGrid = () => {
   for (let x = offsetX + 0.5; x <= canvas.width; x += step) {
     ctx.moveTo(x, 0);
     ctx.lineTo(x, canvas.clientHeight);
-    const unit = parseInt(x / step);
-    ctx.fillText(unit.toString(), x, canvas.height / 2);
+
   }
+
 
   //draw Horizontal Lines
   for (let y = offsetY + 0.5; y <= canvas.height; y+= step) {
@@ -49,11 +49,16 @@ const drawGrid = () => {
   ctx.beginPath();
   ctx.lineWidth = 1.5;
   ctx.strokeStyle = '#3a3a3a';
-  ctx.moveTo(viewportTransform.x + parseInt(canvas.width / 2), 0);
-  ctx.lineTo(viewportTransform.x + parseInt(canvas.width / 2), canvas.height);
+  // multiply step distance times number of squares in canvas horizontally divided by 2 to get to center
+  const centerH = viewportTransform.x + step * (parseInt((canvas.width / step)/2));
+  // multiply step distance times number of squares in canvas vertically divided by 1.9 to get to center
+  const centerV = viewportTransform.y + step * (parseInt((canvas.height / step)/1.9))
+  
+  ctx.moveTo(centerH, 0);
+  ctx.lineTo(centerH, canvas.height);
 
-  ctx.moveTo(0,viewportTransform.y + parseInt(canvas.height / 2));
-  ctx.lineTo(canvas.width, viewportTransform.y + parseInt(canvas.height / 2));
+  ctx.moveTo(0, centerV);
+  ctx.lineTo(canvas.width, centerV);
 
   ctx.stroke();
 }
