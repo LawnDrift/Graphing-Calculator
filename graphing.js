@@ -82,7 +82,7 @@ const drawGrid = () => {
     // "centerV" is the distance from the origin
     // "y - centerV" gives how many pixels away is this line from zero
     // dividing by step returns that in units
-    let currentNum = Math.floor((y - centerV) / step);
+    let currentNum = -1*Math.floor((y - centerV) / step);
 
     //only show even numbers
     if (currentNum % 2 == 0 && currentNum != 0) {
