@@ -18,50 +18,101 @@ const viewportTransform = {
   scale: 1
 };
 
+//square size for each square in grid
+const step = 30;
+
 const drawGrid = () => {
-  const step = 30;
+  
 
   ctx.beginPath();
   ctx.lineWidth = 0.5;
   ctx.strokeStyle = '#9e9e9e';
-  ctx.font = "10px Arial";
+  ctx.textAlign = "right";
+  ctx.font = "14px Arial";
 
   //establish offset based on the new viewport
   const offsetX = viewportTransform.x % step;
   const offsetY = viewportTransform.y % step;
 
-  //draw Vertical Lines
+  // True center origins of the canvas y and x axis
+  // origin moves away as you scroll farther through panning
+  // returns horizontal and vertical distances from the center
+  const centerH = viewportTransform.x + step * (Math.round((canvas.width / step)/2));
+  const centerV = viewportTransform.y + step * (Math.round((canvas.height / step)/2));
+  
+  console.log(centerH);
+  console.log(centerV);
+  console.log("---------");
+
+  //draw vertical lines through each unit visible on screen
   for (let x = offsetX + 0.5; x <= canvas.width; x += step) {
+    //draw the vertical lines that cover screen
     ctx.moveTo(x, 0);
     ctx.lineTo(x, canvas.clientHeight);
+    
+    //draw current coordinate in units
+    // "x" is the line position inside the canvas
+    // "centerH" is the distance from the origin
+    // "x - centerH" gives how many pixels away is this line from zero
+    // dividing by step returns that in units
+    let currentNum = Math.floor((x - centerH) / step);
+
+    //only show even numbers
+    if (currentNum % 2 == 0) {
+      //show x-coord 0 behind the y-axis
+      if (currentNum == 0) {
+        ctx.fillText(currentNum, x-step/4, centerV+step/2);
+      }
+      else {
+        ctx.fillText(currentNum, x, centerV+step/2);
+      }
+      
+    }
 
   }
 
 
-  //draw Horizontal Lines
+  //draw Horizontal Lines through each unit visible on screen
   for (let y = offsetY + 0.5; y <= canvas.height; y+= step) {
     ctx.moveTo(0, y);
     ctx.lineTo(canvas.clientWidth, y);
+
+    //draw current coordinate in units
+    // "y" is the line position inside the canvas
+    // "centerV" is the distance from the origin
+    // "y - centerV" gives how many pixels away is this line from zero
+    // dividing by step returns that in units
+    let currentNum = Math.floor((y - centerV) / step);
+
+    //only show even numbers
+    if (currentNum % 2 == 0 && currentNum != 0) {
+        ctx.fillText(currentNum, centerH-step/5, y+step/4);
+      
+      
+    }
   }
   
   ctx.stroke();
 
+  drawCenterLines(centerH, centerV);
+
+}
+
+const drawCenterLines = (centerH, centerV) => {
   ctx.beginPath();
-  ctx.lineWidth = 1.5;
-  ctx.strokeStyle = '#3a3a3a';
-  // multiply step distance times number of squares in canvas horizontally divided by 2 to get to center
-  const centerH = viewportTransform.x + step * (parseInt((canvas.width / step)/2));
-  // multiply step distance times number of squares in canvas vertically divided by 1.9 to get to center
-  const centerV = viewportTransform.y + step * (parseInt((canvas.height / step)/1.9))
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#555555';
   
   ctx.moveTo(centerH, 0);
   ctx.lineTo(centerH, canvas.height);
+  ctx.stroke();
 
+  ctx.beginPath();
   ctx.moveTo(0, centerV);
   ctx.lineTo(canvas.width, centerV);
-
   ctx.stroke();
 }
+
 
 //keep track of previous mouse position for later
 let previousX = 0;
