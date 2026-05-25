@@ -4,6 +4,7 @@ const ctx = canvas.getContext('2d');
 
 canvas.width = panelContainer.offsetWidth;
 canvas.height = panelContainer.offsetHeight;
+const BASE_STEP = 20;
 
 //update panelContainer whenever window is resized
 window.addEventListener('resize', () => {
@@ -18,12 +19,15 @@ const viewportTransform = {
   scale: 1
 };
 
-//square size for each square in grid
-const step = 30;
+
 
 const drawGrid = () => {
+  //square size for each square in grid
+  let step = BASE_STEP * viewportTransform.scale;
   
-
+  const halfWidth = Math.round(canvas.width / 2);
+  const halfHeight = Math.round(canvas.height / 2);
+  step = halfWidth / Math.round(halfWidth/step);
   ctx.beginPath();
   ctx.lineWidth = 0.5;
   ctx.strokeStyle = '#9e9e9e';
@@ -42,21 +46,21 @@ const drawGrid = () => {
   
   console.log(centerH);
   console.log(centerV);
-  console.log("---------");
-
+  console.log(canvas.width/2);
+  console.log(canvas.height/2);
+  console.log('------');
   //draw vertical lines through each unit visible on screen
   for (let x = offsetX + 0.5; x <= canvas.width; x += step) {
     //draw the vertical lines that cover screen
     ctx.moveTo(x, 0);
-    ctx.lineTo(x, canvas.clientHeight);
+    ctx.lineTo(x, canvas.height);
     
     //draw current coordinate in units
     // "x" is the line position inside the canvas
     // "centerH" is the distance from the origin
     // "x - centerH" gives how many pixels away is this line from zero
     // dividing by step returns that in units
-    let currentNum = Math.floor((x - centerH) / step);
-
+    let currentNum = Math.round((x - centerH) / step);
     //only show even numbers
     if (currentNum % 2 == 0) {
       //show x-coord 0 behind the y-axis
@@ -68,6 +72,7 @@ const drawGrid = () => {
       }
       
     }
+  
 
   }
 
@@ -75,14 +80,14 @@ const drawGrid = () => {
   //draw Horizontal Lines through each unit visible on screen
   for (let y = offsetY + 0.5; y <= canvas.height; y+= step) {
     ctx.moveTo(0, y);
-    ctx.lineTo(canvas.clientWidth, y);
+    ctx.lineTo(canvas.width, y);
 
     //draw current coordinate in units
     // "y" is the line position inside the canvas
     // "centerV" is the distance from the origin
     // "y - centerV" gives how many pixels away is this line from zero
     // dividing by step returns that in units
-    let currentNum = -1*Math.floor((y - centerV) / step);
+    let currentNum = -1*Math.round((y - centerV) / step);
 
     //only show even numbers
     if (currentNum % 2 == 0 && currentNum != 0) {
@@ -134,23 +139,11 @@ const updatePanning = (e) => {
 }
 
 const updateZooming = (e) => {
-  const oldScale = viewportTransform.scale;
-  const oldX = viewportTransform.x;
-  const oldY = viewportTransform.y;
+  e.preventDefault();
+  const zoom = Math.exp(-e.deltaY * 0.001);
 
-  const localX = e.clientX;
-  const localY = e.clientY;
+  viewportTransform.scale *= zoom;
 
-  const previousScale = viewportTransform.scale;
-
-  const newScale = (viewportTransform.scale += e.deltaY * -0.01);
-
-  const newX = localX - (localX - oldX) * (newScale / previousScale);
-  const newY = localY - (localY - oldY) * (newScale / previousScale);
-
-  viewportTransform.x = newX;
-  viewportTransform.y = newY;
-  viewportTransform.scale = newScale;
 }
 
 const render = () => {
@@ -190,7 +183,7 @@ canvas.addEventListener('mousedown', (e) => {
 canvas.addEventListener('mouseup', (e) => {
   canvas.removeEventListener('mousemove', onMouseMove);
 })
-canvas.addEventListener('wheel', onMouseWheel);
+canvas.addEventListener('wheel', onMouseWheel, {passive: false});
 
 
 render();
