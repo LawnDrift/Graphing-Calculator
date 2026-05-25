@@ -4,7 +4,7 @@ const ctx = canvas.getContext('2d');
 
 canvas.width = panelContainer.offsetWidth;
 canvas.height = panelContainer.offsetHeight;
-const BASE_STEP = 40;
+const BASE_STEP = 30;
 
 //update panelContainer whenever window is resized
 window.addEventListener('resize', () => {
@@ -16,7 +16,9 @@ window.addEventListener('resize', () => {
 const viewportTransform = {
   x: 0,
   y: 0,
-  scale: 1
+  scale: 1,
+  numScale: 1,
+  multiple: 5
 };
 
 
@@ -28,6 +30,8 @@ const drawGrid = () => {
   
   //square size for each square in grid, changes with zooming
   const step = BASE_STEP * viewportTransform.scale;
+
+  
   
   ctx.beginPath();
   ctx.lineWidth = 0.5;
@@ -71,11 +75,22 @@ const drawGrid = () => {
 
 const drawCoordinates = (centerH, centerV, step) => {
   ctx.beginPath();
-  ctx.textAlign = "right";
+  ctx.textAlign = "center";
   ctx.font = "14px Arial";
   ctx.fillStyle = "black";
 
-  const numScale = Math.round(viewportTransform.scale);
+  if (step >= 60) {
+    viewportTransform.numScale /= viewportTransform.multiple;
+    viewportTransform.scale = 1;
+  }
+  else if (step <= 20) {
+    viewportTransform.numScale *= viewportTransform.multiple;
+    viewportTransform.scale = 1;
+  }
+
+  
+
+  const numScale = viewportTransform.numScale;
   
   // Vertical lines to the right of y-axis
   for (let x = centerH; x <= canvas.width; x += step) {
@@ -84,26 +99,26 @@ const drawCoordinates = (centerH, centerV, step) => {
     // "centerH" is the distance from the origin
     // "x - centerH" gives how many pixels away is this line from zero
     // dividing by step returns that in units
-    const currentNum = Math.round((x - centerH) / step) * numScale;
+    const currentNum = Math.round((x - centerH) / step);
     //only show even numbers
-    if (currentNum % 2 == 0) {
+    if (currentNum % 5 == 0) {
       //show x-coord 0 behind the y-axis
       if (currentNum == 0) {
-        ctx.fillText(currentNum, x-step/4, centerV+step/2);
+        ctx.fillText(currentNum, x-step/2, centerV+step/1.5);
       }
       else {
-        ctx.fillText(currentNum, x, centerV+step/2);
+        ctx.fillText(currentNum * numScale, x, centerV+step/1.5);
       }
     }
   }
   // Vertical lines to the left of y-axis
   for (let x = centerH - step; x >= 0; x -= step) {
-    const currentNum = Math.round((x - centerH) / step) * numScale;
-    if (currentNum % 2 == 0) {
-      ctx.fillText(currentNum, x, centerV+step/2);
+    const currentNum = Math.round((x - centerH) / step);
+    if (currentNum % 5 == 0) {
+      ctx.fillText(currentNum * numScale, x, centerV+step/1.5);
     }
   }
-
+  ctx.textAlign = "right";
   // Horizontal lines below x-axis
   for (let y = centerV; y <= canvas.height; y += step) {
     //draw current coordinate in units
@@ -111,21 +126,26 @@ const drawCoordinates = (centerH, centerV, step) => {
     // "centerV" is the distance from the origin
     // "y - centerV" gives how many pixels away is this line from zero
     // dividing by step returns that in units
-    const currentNum = -1*Math.round((y - centerV) / step) * numScale;
+    const currentNum = -1*Math.round((y - centerV) / step);
     //only show even numbers
-    if (currentNum % 2 == 0 && currentNum != 0) {
-        ctx.fillText(currentNum, centerH-step/5, y+step/4);
+    if (currentNum % 5 == 0 && currentNum != 0) {
+        ctx.fillText(currentNum * numScale, centerH-step/5, y+step/4);
     }
   }
 
   //Horizontal lines above x-axis
   for (let y = centerV - step; y >= 0; y -= step) {
-    const currentNum = -1*Math.round((y - centerV) / step) * numScale;
-    if (currentNum % 2 == 0 && currentNum != 0) {
-        ctx.fillText(currentNum, centerH-step/5, y+step/4);
+    const currentNum = -1*Math.round((y - centerV) / step);
+    if (currentNum % 5 == 0 && currentNum != 0) {
+        ctx.fillText(currentNum * numScale, centerH-step/5, y+step/4);
     }
   }
-
+  if (viewportTransform.multiple == 2) {
+    viewportTransform.multiple = 5;
+  }
+  else {
+    viewportTransform.multiple = 2;
+  }
   ctx.stroke();
 }
 
@@ -169,7 +189,7 @@ const updateZooming = (e) => {
   const zoom = Math.exp(-e.deltaY * 0.001);
 
   viewportTransform.scale *= zoom;
-
+  console.log(viewportTransform.scale);
 }
 
 const render = () => {
