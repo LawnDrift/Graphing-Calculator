@@ -18,7 +18,9 @@ const viewportTransform = {
   y: 0,
   scale: 1,
   numScale: 1,
-  multiple: 5
+  pattern: [2.5, 2, 2], // change coordinates when zooming to follow these patterns
+  patternIndex: 0,
+  lastZoomState: "normal"
 };
 
 
@@ -29,7 +31,7 @@ const drawGrid = () => {
   const centerV = viewportTransform.y + canvas.height/2;
   
   //square size for each square in grid, changes with zooming
-  const step = BASE_STEP * viewportTransform.scale;
+  let step = BASE_STEP * viewportTransform.scale;
 
   
   
@@ -73,21 +75,24 @@ const drawGrid = () => {
   drawCoordinates(centerH, centerV, step);
 }
 
+const formatNum = (value) => {
+  // convert number to scientific notation for tiny values
+  if (Math.abs(value) > 0 && Math.abs(value) < 0.00001) {
+    return value.toExponential(2);
+  }
+  //convert number to scientific notation if it's too big
+  else if (Math.abs(value) > 1000000000) {
+    return value.toExponential(2);
+  }
+  
+  return Number(value.toFixed(5));
+};
+
 const drawCoordinates = (centerH, centerV, step) => {
   ctx.beginPath();
   ctx.textAlign = "center";
   ctx.font = "14px Arial";
   ctx.fillStyle = "black";
-
-  if (step >= 60) {
-    viewportTransform.numScale /= viewportTransform.multiple;
-    viewportTransform.scale = 1;
-  }
-  else if (step <= 20) {
-    viewportTransform.numScale *= viewportTransform.multiple;
-    viewportTransform.scale = 1;
-  }
-
   
 
   const numScale = viewportTransform.numScale;
@@ -100,22 +105,28 @@ const drawCoordinates = (centerH, centerV, step) => {
     // "x - centerH" gives how many pixels away is this line from zero
     // dividing by step returns that in units
     const currentNum = Math.round((x - centerH) / step);
-    //only show even numbers
+    //final Num scaled after zooming in our out
+    const finalNum = formatNum(currentNum*numScale);
+
+    //only show num after 5 square coordinates
     if (currentNum % 5 == 0) {
       //show x-coord 0 behind the y-axis
       if (currentNum == 0) {
-        ctx.fillText(currentNum, x-step/2, centerV+step/1.5);
+        ctx.fillText(currentNum, x-step/3, centerV+step/1.5);
       }
       else {
-        ctx.fillText(currentNum * numScale, x, centerV+step/1.5);
+        ctx.fillText(finalNum, x, centerV+step/1.5);
       }
     }
   }
   // Vertical lines to the left of y-axis
   for (let x = centerH - step; x >= 0; x -= step) {
     const currentNum = Math.round((x - centerH) / step);
+    //final Num scaled after zooming in our out
+    const finalNum = formatNum(currentNum*numScale);
+
     if (currentNum % 5 == 0) {
-      ctx.fillText(currentNum * numScale, x, centerV+step/1.5);
+      ctx.fillText(finalNum, x, centerV+step/1.5);
     }
   }
   ctx.textAlign = "right";
@@ -127,32 +138,32 @@ const drawCoordinates = (centerH, centerV, step) => {
     // "y - centerV" gives how many pixels away is this line from zero
     // dividing by step returns that in units
     const currentNum = -1*Math.round((y - centerV) / step);
-    //only show even numbers
+    //final Num scaled after zooming in our out
+    const finalNum = formatNum(currentNum*numScale);
+
+    //only show num after 5 square coordinates
     if (currentNum % 5 == 0 && currentNum != 0) {
-        ctx.fillText(currentNum * numScale, centerH-step/5, y+step/4);
+        ctx.fillText(finalNum, centerH-step/5, y+step/4);
     }
   }
 
   //Horizontal lines above x-axis
   for (let y = centerV - step; y >= 0; y -= step) {
     const currentNum = -1*Math.round((y - centerV) / step);
+    //final Num scaled after zooming in our out
+    const finalNum = formatNum(currentNum*numScale);
+
     if (currentNum % 5 == 0 && currentNum != 0) {
-        ctx.fillText(currentNum * numScale, centerH-step/5, y+step/4);
+        ctx.fillText(finalNum, centerH-step/5, y+step/4);
     }
-  }
-  if (viewportTransform.multiple == 2) {
-    viewportTransform.multiple = 5;
-  }
-  else {
-    viewportTransform.multiple = 2;
   }
   ctx.stroke();
 }
 
 const drawCenterLines = (centerH, centerV) => {
   ctx.beginPath();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = '#555555';
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = '#232323';
   
   ctx.moveTo(centerH, 0);
   ctx.lineTo(centerH, canvas.height);
@@ -184,12 +195,49 @@ const updatePanning = (e) => {
   previousY = localY;
 }
 
+const updateNumberScale = () => {
+  const step = BASE_STEP * viewportTransform.scale;
+
+
+  if (step >= 50) {
+    const divisor = viewportTransform.pattern[viewportTransform.patternIndex];
+
+    viewportTransform.numScale /= divisor;
+    viewportTransform.patternIndex++;
+
+    if (viewportTransform.patternIndex >= viewportTransform.pattern.length) {
+      viewportTransform.patternIndex = 0;
+    }
+
+    // reset grid size to keep zooming in
+    viewportTransform.scale = 1;
+  }
+
+  else if (step <= 20) {
+    viewportTransform.patternIndex--;
+    
+    
+    if (viewportTransform.patternIndex < 0) {
+      viewportTransform.patternIndex = viewportTransform.pattern.length - 1;
+    }
+
+    const multiplier = viewportTransform.pattern[viewportTransform.patternIndex];
+    viewportTransform.numScale *= multiplier;
+    
+
+    // reset grid size to keep zooming in
+    viewportTransform.scale = 1;
+  }
+}
+
 const updateZooming = (e) => {
   e.preventDefault();
-  const zoom = Math.exp(-e.deltaY * 0.001);
+  const zoom = Math.exp(-e.deltaY * 0.0005);
+  viewportTransform.scale *= zoom;  
 
-  viewportTransform.scale *= zoom;
   console.log(viewportTransform.scale);
+  updateNumberScale();
+  
 }
 
 const render = () => {
