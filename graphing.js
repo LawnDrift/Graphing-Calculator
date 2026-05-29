@@ -208,7 +208,6 @@ const updateNumberScale = () => {
     if (viewportTransform.patternIndex >= viewportTransform.pattern.length) {
       viewportTransform.patternIndex = 0;
     }
-
     // reset grid size to keep zooming in
     viewportTransform.scale = 1;
   }
@@ -223,8 +222,6 @@ const updateNumberScale = () => {
 
     const multiplier = viewportTransform.pattern[viewportTransform.patternIndex];
     viewportTransform.numScale *= multiplier;
-    
-
     // reset grid size to keep zooming in
     viewportTransform.scale = 1;
   }
