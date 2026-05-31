@@ -1,4 +1,6 @@
 const panelContainer = document.getElementById('graphing-panel');
+const zoomInBtn = document.getElementById('zoom-in');
+const zoomOutBtn = document.getElementById('zoom-out');
 const canvas = document.getElementById('my-canvas');
 const ctx = canvas.getContext('2d');
 
@@ -232,7 +234,6 @@ const updateZooming = (e) => {
   const zoom = Math.exp(-e.deltaY * 0.0005);
   viewportTransform.scale *= zoom;  
 
-  console.log(viewportTransform.scale);
   updateNumberScale();
   
 }
@@ -262,9 +263,11 @@ const onMouseMove = (e) => {
 const onMouseWheel = (e) => {
   updateZooming(e);
   render();
+  console.log(e);
 }
 
 /* Event Listeners */
+
 canvas.addEventListener('mousedown', (e) => {
   previousX = e.clientX;
   previousY = e.clientY;
@@ -276,6 +279,25 @@ canvas.addEventListener('mouseup', (e) => {
 })
 canvas.addEventListener('wheel', onMouseWheel, {passive: false});
 
+zoomInBtn.addEventListener('click', () => {
+    const wheelEvent = new WheelEvent('wheel', {
+      deltaY: -800,
+      bubbles: true,
+      cancelable: true
+    });
+
+    canvas.dispatchEvent(wheelEvent);
+});
+
+zoomOutBtn.addEventListener('click', () => {
+    const wheelEvent = new WheelEvent('wheel', {
+      deltaY: 800,
+      bubbles: true,
+      cancelable: true
+    });
+
+    canvas.dispatchEvent(wheelEvent);
+});
 
 render();
 

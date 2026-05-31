@@ -51,6 +51,7 @@ main {
 }
 
 .btn {
+  position: relative;
   border: 1px solid rgb(215, 215, 215);
   font-weight: bold;
   color: rgb(89, 89, 89);
@@ -59,27 +60,33 @@ main {
   padding: 8px 10px;
 }
 
-.tag {
+.btn .tag {
   
-  position: fixed;
+  font-weight: normal;
+  position: absolute;
+  background-color: rgba(0, 0, 0);
+  color: white;
+  padding: 7px 8px 7px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+
+  right: 45px;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.16s ease-in 0.5s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.btn:hover .tag {
+  opacity: 1;
 }
 
-#tag-zoom-in {
-  right: 50px;
-  top: 80px;
-}
-
-#tag-zoom-out {
-  right: 50px;
-  top: 120px;
-}
-
-.btn:hover + .tag {
+.btn:hover{
   color: rgb(28, 28, 28);
   cursor: pointer;
-  opacity: 1;
+}
+
+.btn:active {
+  background-color: rgb(227, 227, 227);
 }
 
 .btn:nth-of-type(1) {
