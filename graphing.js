@@ -20,10 +20,12 @@ const viewportTransform = {
   y: 0,
   scale: 1,
   numScale: 1,
+  stepsCount: 5,
   pattern: [2.5, 2, 2], // change coordinates when zooming to follow these patterns
   patternIndex: 0,
   lastZoomState: "normal"
 };
+
 
 
 
@@ -34,41 +36,100 @@ const drawGrid = () => {
   
   //square size for each square in grid, changes with zooming
   let step = BASE_STEP * viewportTransform.scale;
-
+  let counter = 0;
   
   
   ctx.beginPath();
   ctx.lineWidth = 0.5;
-  ctx.strokeStyle = '#9e9e9e';
-  
+  ctx.strokeStyle = '#c1c1c1';
 
- 
-  console.log('------');
   // Vertical lines to the right of y-axis
   for (let x = centerH; x <= canvas.width; x += step) {
     //draw the vertical lines that cover screen
     ctx.moveTo(x+0.5, 0);
     ctx.lineTo(x+0.5, canvas.height);
+
+    //draw major Gridlines
+    if (counter % viewportTransform.stepsCount == 0) {
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = '#626262';
+      ctx.moveTo(x+0.5, 0);
+      ctx.lineTo(x+0.5, canvas.height);
+      ctx.stroke();
+      ctx.beginPath();
+    }
+    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = '#c1c1c1';
+    counter++;
   }
 
+  counter = 1;
   // Vertical lines to the left of y-axis
   for (let x = centerH - step; x >= 0; x -= step) {
     //draw the vertical lines that cover screen
     ctx.moveTo(x+0.5, 0);
     ctx.lineTo(x+0.5, canvas.height);
+    
+    //draw major Gridlines
+    if (counter % viewportTransform.stepsCount == 0) {
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = '#626262';
+      ctx.moveTo(x+0.5, 0);
+      ctx.lineTo(x+0.5, canvas.height);
+      ctx.stroke();
+      ctx.beginPath();
+    }
+    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = '#c1c1c1';
+    counter++;
   }
 
-
+  counter = 0;
   //Horizontal lines below x-axis
   for (let y = centerV; y <= canvas.height; y += step) {
     ctx.moveTo(0, y+0.5);
     ctx.lineTo(canvas.width, y+0.5);
+
+    //draw major Gridlines
+    if (counter % viewportTransform.stepsCount == 0) {
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = '#626262';
+      ctx.moveTo(0, y+0.5);
+      ctx.lineTo(canvas.width, y+0.5);
+      ctx.stroke();
+      ctx.beginPath();
+    }
+    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = '#c1c1c1';
+    counter++;
   }
   
+  counter = 1;
   //Horizontal lines above x-axis
   for (let y = centerV - step; y >= 0; y -= step) {
     ctx.moveTo(0, y+0.5);
     ctx.lineTo(canvas.width, y+0.5);
+
+    //draw major Gridlines
+    if (counter % viewportTransform.stepsCount == 0) {
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = '#626262';
+      ctx.moveTo(0, y+0.5);
+      ctx.lineTo(canvas.width, y+0.5);
+      ctx.stroke();
+      ctx.beginPath();
+    }
+    ctx.lineWidth = 0.5;
+    ctx.strokeStyle = '#c1c1c1';
+    counter++;
   }
 
   ctx.stroke();
