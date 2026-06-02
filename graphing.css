@@ -11,13 +11,14 @@ body {
   height: 50px;
   position: fixed;
   display: flex;
-  background-color: pink;
+  background-color: rgb(33, 30, 57);
   align-items: center;
 }
 
 .logo h1 {
   font-size: 25px;
-  
+  color: white;
+  font-weight: normal;
 }
 
 main {
@@ -29,7 +30,7 @@ main {
   display: flex;
   min-width: 300px;
   width: 30%;
-  background-color: bisque;
+  background-color: rgb(56, 57, 98);
   height: 100vh;
 }
 
