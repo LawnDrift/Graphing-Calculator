@@ -36,6 +36,8 @@ const drawGrid = () => {
   
   //square size for each square in grid, changes with zooming
   let step = BASE_STEP * viewportTransform.scale;
+  //counter of steps starting from either y or x-axis
+  // at any direction (left/right or up/down)
   let counter = 0;
   
   
@@ -45,7 +47,7 @@ const drawGrid = () => {
 
   // Vertical lines to the right of y-axis
   for (let x = centerH; x <= canvas.width; x += step) {
-    //draw the vertical lines that cover screen
+    //draw minor vertical gridlines
     ctx.moveTo(x+0.5, 0);
     ctx.lineTo(x+0.5, canvas.height);
 
@@ -68,7 +70,7 @@ const drawGrid = () => {
   counter = 1;
   // Vertical lines to the left of y-axis
   for (let x = centerH - step; x >= 0; x -= step) {
-    //draw the vertical lines that cover screen
+    //draw minor vertical gridlines
     ctx.moveTo(x+0.5, 0);
     ctx.lineTo(x+0.5, canvas.height);
     
@@ -91,6 +93,7 @@ const drawGrid = () => {
   counter = 0;
   //Horizontal lines below x-axis
   for (let y = centerV; y <= canvas.height; y += step) {
+    //draw minor horizontal gridlines
     ctx.moveTo(0, y+0.5);
     ctx.lineTo(canvas.width, y+0.5);
 
@@ -113,6 +116,7 @@ const drawGrid = () => {
   counter = 1;
   //Horizontal lines above x-axis
   for (let y = centerV - step; y >= 0; y -= step) {
+    //draw minor horizontal gridlines
     ctx.moveTo(0, y+0.5);
     ctx.lineTo(canvas.width, y+0.5);
 
@@ -136,6 +140,7 @@ const drawGrid = () => {
   
   drawCenterLines(centerH, centerV);
   drawCoordinates(centerH, centerV, step);
+  drawEdgeCoordinates(centerH, centerV, step);
 }
 
 const formatNum = (value) => {
@@ -220,6 +225,49 @@ const drawCoordinates = (centerH, centerV, step) => {
         ctx.fillText(finalNum, centerH-step/5, y+step/4);
     }
   }
+  ctx.stroke();
+}
+
+
+const drawEdgeCoordinates = (centerH, centerV, step) => {
+  ctx.beginPath();
+  ctx.textAlign = "center";
+  ctx.font = "14px Arial";
+  ctx.fillStyle = "black";
+  
+  const numScale = viewportTransform.numScale;
+  const offsetY = viewportTransform.y % step;
+
+  // if went off to the right, then show edge coordinates
+  // at the left edge
+  // else if went off to the left, show edge coordinates
+  // at the right edge
+  if (centerH < 0) {
+    console.log('You left y-axis');
+    for (let y = offsetY; y <= canvas.height; y += step) {
+      const currentNum = -1*Math.round((y-centerV) / step);
+      //final Num scaled after zooming in our out
+      const finalNum = formatNum(currentNum*numScale);
+
+      //only show num after 5 square coordinates
+      if (currentNum % 5 == 0 || currentNum == 0) {
+          ctx.fillText(finalNum, step/3, y+step/4);
+      }  
+    }
+  }
+  else if (centerH > canvas.width) {
+    for (let y = offsetY; y <= canvas.height; y += step) {
+      const currentNum = -1*Math.round((y-centerV) / step);
+      //final Num scaled after zooming in our out
+      const finalNum = formatNum(currentNum*numScale);
+
+      //only show num after 5 square coordinates
+      if (currentNum % 5 == 0 || currentNum == 0) {
+          ctx.fillText(finalNum, canvas.width-step/3, y+step/4);
+      }  
+    }
+  }
+
   ctx.stroke();
 }
 
@@ -324,7 +372,7 @@ const onMouseMove = (e) => {
 const onMouseWheel = (e) => {
   updateZooming(e);
   render();
-  console.log(e);
+
 }
 
 /* Event Listeners */
