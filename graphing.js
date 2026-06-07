@@ -233,41 +233,116 @@ const drawEdgeCoordinates = (centerH, centerV, step) => {
   ctx.beginPath();
   ctx.textAlign = "center";
   ctx.font = "14px Arial";
-  ctx.fillStyle = "black";
+  ctx.fillStyle = "rgb(122, 122, 122)";
   
   const numScale = viewportTransform.numScale;
-  const offsetY = viewportTransform.y % step;
+  const edgePadding = 30;
+  const hNumsTopPadding = 70;
+  const hNumsBottomPadding = 10;
+  const vNumsPadding = 10;
+
+
+  // VERTICAL EDGE COORDINATES, Y VALUES
 
   // if went off to the right, then show edge coordinates
   // at the left edge
   // else if went off to the left, show edge coordinates
   // at the right edge
   if (centerH < 0) {
-    console.log('You left y-axis');
-    for (let y = offsetY; y <= canvas.height; y += step) {
-      const currentNum = -1*Math.round((y-centerV) / step);
-      //final Num scaled after zooming in our out
+    //alignment so that numbers don't go offscreen
+    ctx.textAlign = "left";
+    for (let y = centerV; y <= canvas.height; y += step) {
+      const currentNum = -1*Math.round((y - centerV) / step);
       const finalNum = formatNum(currentNum*numScale);
 
       //only show num after 5 square coordinates
-      if (currentNum % 5 == 0 || currentNum == 0) {
-          ctx.fillText(finalNum, step/3, y+step/4);
-      }  
+      if (currentNum % 5 == 0 && currentNum != 0) {
+          ctx.fillText(finalNum, vNumsPadding, y+step/4);
+      }
+      if (currentNum == 0) {
+          ctx.fillText(finalNum, vNumsPadding, y+step/1.5);
+      }
+    }
+
+    for (let y = centerV - step; y >= 0; y -= step) {
+      const currentNum = -1*Math.round((y - centerV) / step);
+      const finalNum = formatNum(currentNum*numScale);
+
+      if (currentNum % 5 == 0 && currentNum != 0) {
+          ctx.fillText(finalNum, vNumsPadding, y+step/4);
+      }
     }
   }
   else if (centerH > canvas.width) {
-    for (let y = offsetY; y <= canvas.height; y += step) {
-      const currentNum = -1*Math.round((y-centerV) / step);
-      //final Num scaled after zooming in our out
+    //alignment so that numbers don't go offscreen
+    ctx.textAlign = "right";
+    for (let y = centerV; y <= canvas.height; y += step) {
+      const currentNum = -1*Math.round((y - centerV) / step);
       const finalNum = formatNum(currentNum*numScale);
 
       //only show num after 5 square coordinates
-      if (currentNum % 5 == 0 || currentNum == 0) {
-          ctx.fillText(finalNum, canvas.width-step/3, y+step/4);
-      }  
+      if (currentNum % 5 == 0 && currentNum != 0) {
+          ctx.fillText(finalNum, canvas.width-vNumsPadding, y+step/4);
+      }
+      if (currentNum == 0) {
+          ctx.fillText(finalNum, canvas.width-vNumsPadding, y+step/1.5);
+      }
+    }
+
+    for (let y = centerV - step; y >= 0; y -= step) {
+      const currentNum = -1*Math.round((y - centerV) / step);
+      const finalNum = formatNum(currentNum*numScale);
+
+      if (currentNum % 5 == 0 && currentNum != 0) {
+          ctx.fillText(finalNum, canvas.width-vNumsPadding, y+step/4);
+      }
     }
   }
 
+
+  // HORIZONTAL EDGE COORDINATES , X VALUES
+
+  ctx.textAlign = "center";
+  if (centerV < edgePadding) {
+    for (let x = centerH; x <= canvas.width; x += step) {
+      const currentNum = Math.round((x - centerH) / step);
+      const finalNum = formatNum(currentNum*numScale);
+
+      //only show num after 5 square coordinates
+      if (currentNum % 5 == 0 && currentNum != 0) {
+        ctx.fillText(finalNum, x, hNumsTopPadding);
+      }
+    }
+    // Vertical lines to the left of y-axis
+    for (let x = centerH - step; x >= 0; x -= step) {
+      const currentNum = Math.round((x - centerH) / step);
+      const finalNum = formatNum(currentNum*numScale);
+
+      if (currentNum % 5 == 0 && currentNum != 0) {
+        ctx.fillText(finalNum, x, hNumsTopPadding);
+      }
+    }
+  }
+  else if (centerV > canvas.height) {
+    for (let x = centerH; x <= canvas.width; x += step) {
+      const currentNum = Math.round((x - centerH) / step);
+      const finalNum = formatNum(currentNum*numScale);
+
+      //only show num after 5 square coordinates
+      if (currentNum % 5 == 0 && currentNum != 0) {
+        ctx.fillText(finalNum, x, canvas.height-hNumsBottomPadding);
+      }
+    }
+    // Vertical lines to the left of y-axis
+    for (let x = centerH - step; x >= 0; x -= step) {
+      const currentNum = Math.round((x - centerH) / step);
+      const finalNum = formatNum(currentNum*numScale);
+
+      if (currentNum % 5 == 0 && currentNum != 0) {
+        ctx.fillText(finalNum, x, canvas.height-hNumsBottomPadding);
+      }
+    }
+  }
   ctx.stroke();
 }
 
