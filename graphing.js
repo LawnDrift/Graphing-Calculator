@@ -1,6 +1,7 @@
 const panelContainer = document.getElementById('graphing-panel');
 const zoomInBtn = document.getElementById('zoom-in');
 const zoomOutBtn = document.getElementById('zoom-out');
+const homeBtn = document.getElementById('home');
 const canvas = document.getElementById('my-canvas');
 const ctx = canvas.getContext('2d');
 
@@ -22,8 +23,7 @@ const viewportTransform = {
   numScale: 1,
   stepsCount: 5,
   pattern: [2.5, 2, 2], // change coordinates when zooming to follow these patterns
-  patternIndex: 0,
-  lastZoomState: "normal"
+  patternIndex: 0
 };
 
 
@@ -481,6 +481,15 @@ zoomOutBtn.addEventListener('click', () => {
     });
 
     canvas.dispatchEvent(wheelEvent);
+});
+
+homeBtn.addEventListener('click', () => {
+  viewportTransform.x = 0;
+  viewportTransform.y = 0;
+  viewportTransform.scale = 1;
+  viewportTransform.numScale = 1;
+  viewportTransform.patternIndex = 0;
+  render();
 });
 
 render();

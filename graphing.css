@@ -90,10 +90,15 @@ main {
   background-color: rgb(227, 227, 227);
 }
 
-.btn:nth-of-type(1) {
+#zoom-in {
   border-radius: 5px 5px 0 0;
 }
 
-.btn:nth-of-type(2) {
+#zoom-out {
   border-radius: 0 0 5px 5px;
+}
+
+#home {
+  margin-top: 10px;
+  border-radius: 5px;
 }
