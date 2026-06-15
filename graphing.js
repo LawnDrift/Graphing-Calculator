@@ -1,3 +1,6 @@
+import { yEqualX } from "./input.js";
+
+
 const panelContainer = document.getElementById('graphing-panel');
 const zoomInBtn = document.getElementById('zoom-in');
 const zoomOutBtn = document.getElementById('zoom-out');
@@ -361,6 +364,41 @@ const drawCenterLines = (centerH, centerV) => {
   ctx.stroke();
 }
 
+const drawPoint = (xVal, yVal) => {
+  const centerH = viewportTransform.x + canvas.width/2;
+  const centerV = viewportTransform.y + canvas.height/2;
+
+  let step = BASE_STEP * viewportTransform.scale;
+  const xDistance = step * xVal;
+  const yDistance = -(step * yVal);
+
+  ctx.beginPath();
+  ctx.fillStyle = 'rgb(255, 0, 0)';
+  ctx.strokeStyle = 'rgb(205, 5, 5)';
+  ctx.arc(centerH + xDistance, centerV + yDistance, 3, 0, 2 * Math.PI, false);
+  ctx.fill();
+  ctx.stroke();
+}
+// the parameters are objects with x and y coords, ex: {x: 1, y: 4}
+const drawLine = (firstPoint, lastPoint) => {
+  const centerH = viewportTransform.x + canvas.width/2;
+  const centerV = viewportTransform.y + canvas.height/2;
+
+  let step = BASE_STEP * viewportTransform.scale;
+  
+  ctx.beginPath();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = '#ff0000';
+  const x1 = firstPoint.x*step;
+  const y1 = -(firstPoint.y*step);
+  const x2 = lastPoint.x*step;
+  const y2 = -(lastPoint.y*step);
+  
+  ctx.moveTo(centerH+x1, centerV+y1);
+  ctx.lineTo(centerH+x2, centerV+y2);
+  ctx.stroke();
+}
+
 
 //keep track of previous mouse position for later
 let previousX = 0;
@@ -427,7 +465,14 @@ const render = () => {
   ctx.clearRect(0,0, canvas.width, canvas.height);
   
   drawGrid();
+  const point1 = yEqualX()[0];
+  const point2 = yEqualX()[yEqualX().length-1];
 
+  for (let i = 0; i < yEqualX().length; i++) {
+    drawPoint(yEqualX()[i].x, yEqualX()[i].y);
+  }
+  drawLine(point1, point2);
+  
   ctx.setTransform(
     viewportTransform.scale,
     0,
