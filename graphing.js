@@ -384,7 +384,7 @@ const drawLine = (firstPoint, lastPoint) => {
   const centerH = viewportTransform.x + canvas.width/2;
   const centerV = viewportTransform.y + canvas.height/2;
 
-  let step = BASE_STEP * viewportTransform.scale;
+  const step = BASE_STEP * viewportTransform.scale;
   
   ctx.beginPath();
   ctx.lineWidth = 1.5;
@@ -396,6 +396,45 @@ const drawLine = (firstPoint, lastPoint) => {
   
   ctx.moveTo(centerH+x1, centerV+y1);
   ctx.lineTo(centerH+x2, centerV+y2);
+  ctx.stroke();
+}
+
+const drawFunction = (f, color="rgb(255, 0, 0)") => {
+  const centerH = viewportTransform.x + canvas.width/2;
+  const centerV = viewportTransform.y + canvas.height/2;
+  const step = BASE_STEP * viewportTransform.scale;
+  //leftmost x-coordinate value visible on screen
+  // "-2" is small buffer so that graph doesn't disappear
+  // at the edge
+  const startX = -Math.floor(centerH/step) - 2;
+  //rightmost x-coordinate value visible on screen
+  // "+2" is small buffer so that graph doesn't disappear
+  // at the edge
+  const endX = Math.floor((canvas.width-centerH) / step);
+
+  ctx.beginPath();
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = color;
+  // track first point for moveTo() function in ctx
+  let first = true;
+
+  for (let x = startX; x <= endX; x+=0.1) {
+    // main function convertion
+    const y = f(x);
+
+    //convert coordinates to actual pixels in canvas
+    const screenCoordX = centerH + x * step;
+    const screenCoordY = centerV - y * step;
+
+    if (first) {
+      ctx.moveTo(screenCoordX, screenCoordY);
+      first = false;
+    }
+    else {
+      ctx.lineTo(screenCoordX, screenCoordY);
+    }
+  }
+
   ctx.stroke();
 }
 
@@ -465,13 +504,12 @@ const render = () => {
   ctx.clearRect(0,0, canvas.width, canvas.height);
   
   drawGrid();
-  const point1 = yEqualX()[0];
-  const point2 = yEqualX()[yEqualX().length-1];
+  const points = yEqualX();
+  const point1 = points[0];
+  const point2 = points[points.length-1];
 
-  for (let i = 0; i < yEqualX().length; i++) {
-    drawPoint(yEqualX()[i].x, yEqualX()[i].y);
-  }
-  drawLine(point1, point2);
+  drawFunction(x => (x*x) * viewportTransform.numScale);
+  
   
   ctx.setTransform(
     viewportTransform.scale,
