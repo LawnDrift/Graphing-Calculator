@@ -489,7 +489,7 @@ const render = () => {
   
   drawGrid();
   drawFunction(quadraticFunc);
-  
+  drawFunction((x => 3*(Math.pow((x-3),2))+5 ), "rgb(58, 200, 2)")
   
   ctx.setTransform(
     viewportTransform.scale,
