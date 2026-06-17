@@ -1,5 +1,5 @@
-import { yEqualX } from "./input.js";
-
+import { linearFunc } from "./input.js";
+import { quadraticFunc } from "./input.js";
 
 const panelContainer = document.getElementById('graphing-panel');
 const zoomInBtn = document.getElementById('zoom-in');
@@ -379,25 +379,7 @@ const drawPoint = (xVal, yVal) => {
   ctx.fill();
   ctx.stroke();
 }
-// the parameters are objects with x and y coords, ex: {x: 1, y: 4}
-const drawLine = (firstPoint, lastPoint) => {
-  const centerH = viewportTransform.x + canvas.width/2;
-  const centerV = viewportTransform.y + canvas.height/2;
 
-  const step = BASE_STEP * viewportTransform.scale;
-  
-  ctx.beginPath();
-  ctx.lineWidth = 1.5;
-  ctx.strokeStyle = '#ff0000';
-  const x1 = firstPoint.x*step;
-  const y1 = -(firstPoint.y*step);
-  const x2 = lastPoint.x*step;
-  const y2 = -(lastPoint.y*step);
-  
-  ctx.moveTo(centerH+x1, centerV+y1);
-  ctx.lineTo(centerH+x2, centerV+y2);
-  ctx.stroke();
-}
 
 const drawFunction = (f, color="rgb(255, 0, 0)") => {
   const centerH = viewportTransform.x + canvas.width/2;
@@ -418,9 +400,11 @@ const drawFunction = (f, color="rgb(255, 0, 0)") => {
   // track first point for moveTo() function in ctx
   let first = true;
 
-  for (let x = startX; x <= endX; x+=0.1) {
+  for (let x = startX; x <= endX; x+=0.05) {
     // main function convertion
-    const y = f(x);
+    // multiply to numScale for accurate
+    // graphing after zooming in or out
+    const y = f(x) *viewportTransform.numScale;
 
     //convert coordinates to actual pixels in canvas
     const screenCoordX = centerH + x * step;
@@ -504,11 +488,7 @@ const render = () => {
   ctx.clearRect(0,0, canvas.width, canvas.height);
   
   drawGrid();
-  const points = yEqualX();
-  const point1 = points[0];
-  const point2 = points[points.length-1];
-
-  drawFunction(x => (x*x) * viewportTransform.numScale);
+  drawFunction(quadraticFunc);
   
   
   ctx.setTransform(
