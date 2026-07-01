@@ -402,13 +402,15 @@ const drawFunction = (f, color="rgb(255, 0, 0)") => {
 
   for (let x = startX; x <= endX; x+=0.05) {
     // main function convertion
-    // multiply to numScale for accurate
-    // graphing after zooming in or out
-    const y = f(x) *viewportTransform.numScale;
-
+    // convert x to graph coordinates (math) with numScale
+    // perform f(x) operation with this value
+    // divide result by numScale to convert back to
+    // grid squares (canvas panel steps)
+    const graphY = f(x *viewportTransform.numScale);
+    const gridY = graphY / viewportTransform.numScale;
     //convert coordinates to actual pixels in canvas
-    const screenCoordX = centerH + x * step;
-    const screenCoordY = centerV - y * step;
+    const screenCoordX = centerH + (x * step);
+    const screenCoordY = centerV - (gridY * step);
 
     if (first) {
       ctx.moveTo(screenCoordX, screenCoordY);
@@ -417,6 +419,7 @@ const drawFunction = (f, color="rgb(255, 0, 0)") => {
     else {
       ctx.lineTo(screenCoordX, screenCoordY);
     }
+    
   }
 
   ctx.stroke();
@@ -489,8 +492,8 @@ const render = () => {
   
   drawGrid();
   drawFunction(quadraticFunc);
-  drawFunction((x => 3*(Math.pow((x-3),2))+5 ), "rgb(58, 200, 2)")
-  
+  drawFunction((x => 3*(Math.pow((x-3),2))+5 ), "rgb(58, 200, 2)");
+  drawFunction((x => Math.sin(x)), "skyblue");
   ctx.setTransform(
     viewportTransform.scale,
     0,
