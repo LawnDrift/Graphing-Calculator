@@ -1,5 +1,4 @@
-import { linearFunc } from "./input.js";
-import { quadraticFunc } from "./input.js";
+import { currentFunction } from "./state.js";
 
 const panelContainer = document.getElementById('graphing-panel');
 const zoomInBtn = document.getElementById('zoom-in');
@@ -486,14 +485,17 @@ const updateZooming = (e) => {
   
 }
 
-const render = () => {
+export const render = () => {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0,0, canvas.width, canvas.height);
   
   drawGrid();
-  drawFunction(quadraticFunc);
-  drawFunction((x => 3*(Math.pow((x-3),2))+5 ), "rgb(58, 200, 2)");
-  drawFunction((x => Math.sin(x)), "skyblue");
+  //drawFunction(quadraticFunc);
+  //drawFunction((x => 3*(Math.pow((x-3),2))+5 ), "rgb(58, 200, 2)");
+  //drawFunction((x => Math.sin(x)), "skyblue");
+  if (currentFunction) {
+    drawFunction(currentFunction);
+  }
   ctx.setTransform(
     viewportTransform.scale,
     0,

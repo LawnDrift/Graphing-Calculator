@@ -1,3 +1,5 @@
+import { setCurrentFunction } from "./state.js";
+import { render } from "./graphing.js";
 const inputEquation= document.querySelector('.equation');
 
 
@@ -10,13 +12,28 @@ export const quadraticFunc = (x) => {
 }
 
 export const userEquation = (inputVal) => {
+  //remove spaces
+  let expr = inputVal.replace(/\s/g, "");
   if (inputVal === "y=x") {
-    console.log('good, it works!');
-    
+    expr = expr.slice(2);
+    const f = new Function("x", `return ${expr};`);
+    return f;
   }
+  
 }
+window.addEventListener('beforeunload', (e) => {
+  e.preventDefault();
+  e.returnValue = '';
+});
+
+window.onload = () => {
+  const inputs = document.querySelectorAll('input[type="text"]');
+  inputs.forEach(input => input.value = "");
+};
 
 inputEquation.addEventListener("input", (e) => {
-
-  userEquation(e.target.value);
+  const f = userEquation(e.target.value);
+  setCurrentFunction(f);
+  render();
 });
+
