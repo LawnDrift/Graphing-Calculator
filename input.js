@@ -14,8 +14,12 @@ export const quadraticFunc = (x) => {
 export const userEquation = (inputVal) => {
   //remove spaces
   let expr = inputVal.replace(/\s/g, "");
-  if (inputVal === "y=x") {
+  if (expr.slice(1)[0] == "=") {
     expr = expr.slice(2);
+    //convert ^ symbol to actual exponentiation
+    expr = expr.replace(/\^/g, "**");
+    //convert "sqrt" to actual symbol
+    
     const f = new Function("x", `return ${expr};`);
     return f;
   }
